@@ -1,11 +1,45 @@
 import requests, json
 
 
-def test_api():
+class Plant:
+    """
+    """
+    def __init__(self, name, coords, watershed = (0,0)):
+        assert type(name) == str
+
+        assert type(coords) == tuple
+        assert type(coords[0]) == float
+        assert type (coords[1]) == float
+
+        assert type(watershed) == tuple
+        assert type (watershed[0]) == float
+        assert type(watershed[1]) == float
+
+        self.name = name
+        self.coords = coords
+        self.watershed = watershed
+
+    def get_coords(self):
+        return self.coords
+
+"""
+Primary class for weather api
+"""
+class Weather:
+    """
+    """
     api_key = "56132dfa8c3dc4b5cb47372c76f9f618"
-    complete_url = "https://api.darksky.net/forecast/" + api_key + "/" + "14.116667" + "," + "-86.866667" + "," + "1581545399?exclude=currently,flags"
-    response = requests.get(complete_url)
-    data_return = response.json()
-    print(data_return)
-if __name__=="__main__":
-    test_api()
+
+    def __init__(self):
+        self.db = {"moroceli": Plant("Moroceli", (14.116667,-86.866667))}
+
+    def general_call(self, plant_name):
+        plant_name = plant_name.lower()
+        plant_coords = self.db[plant_name].get_coords()
+        complete_url = "https://api.darksky.net/forecast/"+api_key+"/"+str(plant_coords[0])+","+str(plant_coords[1])+","+"1581545399?exclude=currently,flags"
+        response = requests.get(complete_url)
+        return response.json()
+
+
+#if __name__=="__main__":
+    #test_api()
