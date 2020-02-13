@@ -1,10 +1,12 @@
 import requests, json
+import time
+import datetime
 
 
 class Plant:
     """
     """
-    def __init__(self, name, coords, watershed = (0,0)):
+    def __init__(self, name, coords, watershed = (0.0,0.0)):
         assert type(name) == str
 
         assert type(coords) == tuple
@@ -33,13 +35,17 @@ class Weather:
     def __init__(self):
         self.db = {"moroceli": Plant("Moroceli", (14.116667,-86.866667))}
 
-    def general_call(self, plant_name):
+    def general_call(self, plant_name, when):
+        assert type(when) == datetime
+
         plant_name = plant_name.lower()
         plant_coords = self.db[plant_name].get_coords()
-        complete_url = "https://api.darksky.net/forecast/"+api_key+"/"+str(plant_coords[0])+","+str(plant_coords[1])+","+"1581545399?exclude=currently,flags"
+        unixtime - time.mktime(when.timetuple())
+        complete_url = "https://api.darksky.net/forecast/"+api_key+"/"+str(plant_coords[0])+","+str(plant_coords[1])+","+str(unixtime)+ "?exclude=currently,flags"
         response = requests.get(complete_url)
         return response.json()
 
 
-#if __name__=="__main__":
-    #test_api()
+if __name__=="__main__":
+    weather = Weather()
+    print(weather.general_call("moroceli", datetime.datetime(1999,6,7)))
