@@ -69,7 +69,12 @@ if __name__=="__main__":
     moroceli_data = data['Moroceli']
     data_matrix = []
     total = 0
-    for data_point in moroceli_data:
+    curr_point = 0
+    for i in range(len(moroceli_data)):
+        if i % 100 != 0:
+            i += 1
+            continue
+        data_point = moroceli_data[i]
         date_1 = data_point['timeFinished']
         t_index = date_1.index("T")
         final_date = date_1[:t_index]
@@ -86,11 +91,20 @@ if __name__=="__main__":
         curr_raw_turb = data_point.get("rawWaterTurbidity", -1)
         curr_settle_turb = data_point.get("settledWaterTurbidity", -1)
         curr_point = [curr_percep_intensity, curr_pressure, curr_wind_speed, curr_temp, curr_raw_turb, curr_settle_turb]
-        print(curr_point)
         data_matrix.append(curr_point)
         total += 1
+        i += 1
         if total > 50:
             break
-kmeans = cluster.KMeans(random_state=0).fit(data_matrix)
-print(data_matrix)
-print(kmeans.labels_)
+    kmeans = cluster.KMeans(random_state=0).fit(data_matrix)
+
+    cluster_dict = {}
+    for i in range(len(data_matrix)):
+        current_cluster = kmeans.labels_[i]
+        curr_val = data_matrix[i]
+        if current_cluster not in cluster_dict:
+            cluster_dict[current_cluster] = [data_matrix[i]]
+        new_lst = cluster_dict[current_cluster]
+        new_lst.append(data_matrix[i])
+        cluster_dict[current_cluster] = new_lst
+    print(cluster_dict)
