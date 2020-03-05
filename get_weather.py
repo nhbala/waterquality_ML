@@ -4,6 +4,7 @@ import firebase_testing
 from datetime import datetime, timedelta
 from sklearn import cluster
 
+
 """
 This class represents an instance of a water treament plant and contains information
 about it, specifically its name, coordinates, and the coordinates of its watershed,
@@ -62,8 +63,7 @@ class Weather:
     def spec_call(self, param, plant_name, when):
         big_dict = self.general_call(plant_name, when)
 
-
-if __name__=="__main__":
+def clusters(param_list):
     weather = Weather()
     data = firebase_testing.get_graph_data()
     moroceli_data = data['Moroceli']
@@ -71,6 +71,7 @@ if __name__=="__main__":
     total = 0
     curr_point = 0
     for i in range(len(moroceli_data)):
+        # Only take every 100 data points
         if i % 100 != 0:
             i += 1
             continue
@@ -83,18 +84,13 @@ if __name__=="__main__":
         datetime_object = datetime.strptime(final_total_date, '%Y-%m-%d %H:%M:%S.%f')
         curr_weather = weather.general_call("moroceli", datetime_object - timedelta(hours=1))
         first_point = curr_weather['hourly']['data'][0]
-        #how to get data?
-        curr_percep_intensity = first_point.get('precipIntensity', -1)
-        curr_pressure = first_point.get('pressure', -1)
-        curr_wind_speed = first_point.get("windSpeed", -1)
-        curr_temp = first_point.get("temperature", -1)
-        curr_raw_turb = data_point.get("rawWaterTurbidity", -1)
-        curr_settle_turb = data_point.get("settledWaterTurbidity", -1)
-        curr_point = [curr_percep_intensity, curr_pressure, curr_wind_speed, curr_temp, curr_raw_turb, curr_settle_turb]
+
+        curr_point = []
+        for str in param_list:
+            curr_point.append(first_point.get(str, -1))
         data_matrix.append(curr_point)
         total += 1
-        i += 1
-        if total > 50:
+        if total >= 50:
             break
     kmeans = cluster.KMeans(random_state=0).fit(data_matrix)
 
@@ -107,4 +103,10 @@ if __name__=="__main__":
         new_lst = cluster_dict[current_cluster]
         new_lst.append(data_matrix[i])
         cluster_dict[current_cluster] = new_lst
+
     print(cluster_dict)
+
+
+if __name__=="__main__":
+    params = ["precep_intensity", "pressure", "windSpeed", "temperature", "rawWaterTurbidity", "settledWaterTurbidity"]
+    clusters(params)
