@@ -104,7 +104,24 @@ def clusters(param_list):
         new_lst.append(data_matrix[i])
         cluster_dict[current_cluster] = new_lst
 
-    print(cluster_dict)
+    return((param_list,cluster_dict))
+
+def clusters_to_sheet(tuple):
+    file = open("clusters.csv", "w")
+    headers = ""
+    for str in tuple[0]:
+        headers.append(str + ",")
+    file.write(headers+"\n")
+
+    #tuple[1] is a dictionary where values are a list of points in cluster (also a list)
+    #each row in file represents a cluster, with each column being a datapoint
+    dict = tuple[1]
+    for k, v in dict:
+        # v is the list of lists
+        this_point = ""
+        for i in v:
+            # i is one of the lists
+
 
 
 if __name__=="__main__":
