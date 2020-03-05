@@ -1,5 +1,6 @@
 import requests, json
 import time
+import os
 import firebase_testing
 from datetime import datetime, timedelta
 from sklearn import cluster
@@ -106,24 +107,37 @@ def clusters(param_list):
 
     return((param_list,cluster_dict))
 
+def convert(n):
+    return str(n)
+
 def clusters_to_sheet(tuple):
     file = open("clusters.csv", "w")
-    headers = ""
+    header = ""
     for str in tuple[0]:
-        headers.append(str + ",")
-    file.write(headers+"\n")
+        header += (str + " | ")
+    file.write("Current parameters: "+header[:(len(header)-3)]+"\n")
 
     #tuple[1] is a dictionary where values are a list of points in cluster (also a list)
     #each row in file represents a cluster, with each column being a datapoint
     dict = tuple[1]
-    for k, v in dict:
+    counter = 0
+    for k, v in dict.items():
         # v is the list of lists
-        this_point = ""
+        row = ""
         for i in v:
+            this_entry = "["
             # i is one of the lists
-
+            to_string = map(convert, i)
+            for entry in to_string:
+                this_entry += (entry+",")
+            this_entry = "\"" + this_entry[:(len(this_entry)-1)] + "]\""
+            row += (this_entry+",")
+        file.write("Cluster #"+convert(counter)+","+row[:(len(row)-1)]+"\n")
+        counter += 1
+    file.close()
+    os.startfile("clusters.csv")
 
 
 if __name__=="__main__":
     params = ["precep_intensity", "pressure", "windSpeed", "temperature", "rawWaterTurbidity", "settledWaterTurbidity"]
-    clusters(params)
+    clusters_to_sheet(clusters(params))
